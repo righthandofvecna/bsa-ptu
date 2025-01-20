@@ -221,7 +221,6 @@ Hooks.on("init", ()=>{
     }
 
     async _updateObject(event, formData) {
-      console.log("_updateObject", this.object, event, formData);
       return ItemSheet.prototype._updateObject.bind(this)(event, formData);
     }
   }
