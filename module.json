@@ -1,0 +1,40 @@
+{
+    "title": "Beaver's System Adaptation PTU/PTR1e",
+    "description": "PTU/PTR1e implementation for Beaver's System Interface",
+    "id": "bsa-ptu",
+    "authors": [
+        {
+            "name": "RightHandOfVecna",
+            "url": "https://github.com/righthandofvecna"
+        }
+    ],
+    "version": "0.0.1",
+    "compatibility": {
+        "minimum": "12",
+        "verified": "12.331"
+    },
+    "relationships": {
+        "systems": [
+            {
+                "id": "ptu",
+                "type": "system",
+                "compatibility": {
+                    "verified": "4.3.7"
+                }
+            }
+        ]
+    },
+    "esmodules": [
+        "main.mjs"
+    ],
+	"documentTypes": {
+	  "Item": {
+		"loot": {
+		  "htmlFields": []
+		}
+	  }
+	},
+    "url": "https://github.com/righthandofvecna/bsa-ptu",
+    "manifest": "https://github.com/righthandofvecna/bsa-ptu/releases/latest/download/module.json",
+    "download": "https://github.com/righthandofvecna/bsa-ptu/releases/download/v0.0.1/module.zip"
+}
