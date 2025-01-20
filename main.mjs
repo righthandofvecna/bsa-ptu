@@ -52,21 +52,21 @@ export class PtuBsi {// not typescript //  implements SystemApi {
   get configSkills() {
     return CONFIG.PTU.data.skills.keys.map(k=>({
       id: k,
-      label: `PTU.Skills.${k}`,
+      label: game.i18n.localize(`PTU.Skills.${k}`),
     }));
   }
 
   get configAbilities() {
     return CONFIG.PTU.data.stats.keys.map(k=>({
       id: k,
-      label: `PTU.Stats.${k}`,
+      label: game.i18n.localize(`PTU.Stats.${k}`),
     }));
   }
 
   get configCurrencies() {
     return [{
       id: "money",
-      label: "PTU.Money",
+      label: game.i18n.localize("PTU.Money"),
       factor: 1,
     }]
   }
@@ -76,7 +76,7 @@ export class PtuBsi {// not typescript //  implements SystemApi {
   get configLootItemType() { return "bsa-ptu.loot"; }
 
   async actorRollSkill(actor, skillId) {
-    return actor.attributes.skills[skillId]?.roll();
+    return actor.attributes.skills[skillId]?.roll().then(roll=>roll?.rolls?.[0]);
   }
 
   async actorRollAbility(actor, abilityId) {
@@ -113,6 +113,16 @@ export class PtuBsi {// not typescript //  implements SystemApi {
   get itemQuantityAttribute() { return "system.quantity"; }
 
   get itemPriceAttribute() { return "system.cost"; }
+
+  itemSheetReplaceContent(app, html, element) {
+    html.find(".sheet-tabs").remove();
+    const header = html.find('.window-content form header').clone();
+    const sheetBody = html.find('.window-content form');
+    sheetBody.css("flex-direction", "column");
+    sheetBody.empty();
+    sheetBody.append(header);
+    sheetBody.append(element);
+  }
 }
 
 class SkillTest { // not typescript// implements TestClass<"skill"|"dc"> {
@@ -185,6 +195,14 @@ class SkillTestCustomized { // not typescript // implements Test<"skill"|"dc"> {
 
 
 Hooks.on("init", ()=>{
+  //
+  // Beaver's Recipe relies on a very bad implementation of "not" in handlebars. Fix the handlebars implementation
+  //
+  Handlebars.unregisterHelper("not");
+  Handlebars.registerHelper("not", (a)=>!a);
+
+
+
   class LootClass extends CONFIG.PTU.Item.documentClasses.item {
     async _preCreate(data, options, user) {
       this._source.system.rules ??= [];
@@ -192,11 +210,34 @@ Hooks.on("init", ()=>{
     }
   }
 
+  class LootSheet extends CONFIG.PTU.Item.sheetClasses.item {
+    get template() {
+      return `systems/ptu/static/templates/item/item-sheet.hbs`;
+    }
+
+    async getData() {
+      const data = await super.getData();
+      return data;
+    }
+
+    async _updateObject(event, formData) {
+      console.log("_updateObject", this.object, event, formData);
+      return ItemSheet.prototype._updateObject.bind(this)(event, formData);
+    }
+  }
+
+  const LC_NAME = "bsa-ptu.loot";
+
   Object.assign(CONFIG.PTU.Item.documentClasses, {
-    "bsa-ptu.loot": LootClass,
+    [LC_NAME]: LootClass,
   });
   Object.assign(CONFIG.PTU.Item.sheetClasses, {
-    "bsa-ptu.loot": LootClass,
+    [LC_NAME]: LootSheet,
+  });
+  Items.registerSheet("ptu", LootSheet, {
+    types: [LC_NAME],
+    makeDefault: true,
+    label: "BSAPTU.SheetClassLoot"
   });
 });
 
