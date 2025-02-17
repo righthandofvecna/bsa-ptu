@@ -199,9 +199,9 @@ Hooks.on("init", ()=>{
   // Beaver's Recipe relies on a very bad implementation of "not" in handlebars. Fix the handlebars implementation
   //
   Handlebars.unregisterHelper("not");
-  Handlebars.registerHelper("not", (a)=>!a);
-
-
+  Handlebars.registerHelper("not", function (a, b = false) {
+    return arguments.length == 2 ? !a : a != b;
+  });
 
   class LootClass extends CONFIG.PTU.Item.documentClasses.item {
     async _preCreate(data, options, user) {
